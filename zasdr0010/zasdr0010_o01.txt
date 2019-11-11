@@ -1,0 +1,209 @@
+*&---------------------------------------------------------------------*
+*& Include          ZASDR0010_O01
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*& Module STATUS_0100 OUTPUT
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+MODULE STATUS_0100 OUTPUT.
+ SET PF-STATUS 'PF_0100'.
+ SET TITLEBAR 'T_0100'.
+ENDMODULE.
+*&---------------------------------------------------------------------*
+*& Module ALV_INIT_DISPLAY_0100 OUTPUT
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+MODULE ALV_INIT_DISPLAY_0100 OUTPUT.
+ "-- 화면의  GRID가 BOUND되었는지 확인한다.
+  IF GR_GRID1 IS NOT BOUND. "바운드 - 생성이 되었냐 안되었냐
+
+    "-- GRID의 INSTANCE를 생성한다.
+    PERFORM CREATE_INSTANCE_0100.
+*
+*    "-- GRID의 LAYOUT 속성을 정의한다.
+    PERFORM INIT_LAYOUT_0100.
+*
+*    "-- ALV Standard toolbar button cotrol
+    PERFORM SET_GRID_EXCLUDE_0100.
+*
+*    "-- ALV Sort
+*    PERFORM ALV_SORT_0100.
+*
+*    "-- Field Attribute을 사용자의 요구사항에 맞게 변경
+    PERFORM APPEND_FIELDCAT_0100.
+*
+*    "-- ALV Events 등록
+    PERFORM REGIST_ALV_EVENT_0100 USING GR_GRID1.
+*
+*    "-- ALV Display
+    PERFORM DISPLAY_ALV_GRID_0100.
+
+*    "-- ALV Title
+*    PERFORM DISPLAY_ALV_TITLE_0100.
+
+  ELSE.
+
+    "-- ALV Refresh
+    PERFORM REFRESH_GRID_0100.
+
+  ENDIF.
+ENDMODULE.
+*&---------------------------------------------------------------------*
+*& Module STATUS_0110 OUTPUT
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+MODULE STATUS_0110 OUTPUT.
+ SET PF-STATUS 'PF_0110'.
+ SET TITLEBAR 'T_0110'.
+ENDMODULE.
+*&---------------------------------------------------------------------*
+*& Module MODIFY_SCREEN OUTPUT
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+MODULE MODIFY_SCREEN OUTPUT.
+
+  PRE_MNUMB = GT_MDISPLAY-MNUMB.
+  B_MNAME = GT_MDISPLAY-MNAME.
+  B_MUNIT = GT_MDISPLAY-MUNIT.
+  B_MLENG = GT_MDISPLAY-MLENG.
+  B_MHGHT = GT_MDISPLAY-MHGHT.
+  B_MSTAN = GT_MDISPLAY-MSTAN.
+
+ENDMODULE.
+*&---------------------------------------------------------------------*
+*& Form CREATE_INSTANCE_0200
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM CREATE_INSTANCE_0200 .
+
+  CREATE OBJECT GR_CON2 "
+    EXPORTING
+      CONTAINER_NAME = GV_CONTAINER2. "
+
+  CREATE OBJECT GR_GRID2 "그리드 만들기
+    EXPORTING
+      I_PARENT = GR_CON2. " 그리드는 항상 컨테이너 위에 올라감. 업어주는 형상.
+  "컨테이너
+  "그리드가 자식 클래스
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form SET_GRID_EXCLUDE_0200
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM SET_GRID_EXCLUDE_0200 .
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Module STATUS_0300 OUTPUT
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+MODULE STATUS_0300 OUTPUT.
+ SET PF-STATUS 'PF_0300'.
+ SET TITLEBAR 'T_0300'.
+ENDMODULE.
+*&---------------------------------------------------------------------*
+*& Module ALV_INIT_DISPLAY_0300 OUTPUT
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+MODULE ALV_INIT_DISPLAY_0300 OUTPUT.
+ "-- 화면의  GRID가 BOUND되었는지 확인한다.
+  IF GR_GRID3 IS NOT BOUND. "바운드 - 생성이 되었냐 안되었냐
+
+    "-- GRID의 INSTANCE를 생성한다.
+    PERFORM CREATE_INSTANCE_0300.
+*
+*    "-- GRID의 LAYOUT 속성을 정의한다.
+    PERFORM INIT_LAYOUT_0300.
+*
+*    "-- ALV Standard toolbar button cotrol
+    PERFORM SET_GRID_EXCLUDE_0100.
+*
+*    "-- ALV Sort
+*    PERFORM ALV_SORT_0100.
+*
+*    "-- Field Attribute을 사용자의 요구사항에 맞게 변경
+    PERFORM APPEND_FIELDCAT_0300.
+*
+*    "-- ALV Events 등록
+    PERFORM REGIST_ALV_EVENT_0300 USING GR_GRID3.
+*
+*    "-- ALV Display
+    PERFORM DISPLAY_ALV_GRID_0300.
+
+*    "-- ALV Title
+*    PERFORM DISPLAY_ALV_TITLE_0100.
+
+  ELSE.
+
+    "-- ALV Refresh
+    PERFORM REFRESH_GRID_0300.
+
+  ENDIF.
+ENDMODULE.
+*&---------------------------------------------------------------------*
+*& Module STATUS_0400 OUTPUT
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+MODULE STATUS_0400 OUTPUT.
+ SET PF-STATUS 'PF_0400'.
+ SET TITLEBAR 'T_0400'.
+ENDMODULE.
+*&---------------------------------------------------------------------*
+*& Module ALV_INIT_DISPLAY_0400 OUTPUT
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+MODULE ALV_INIT_DISPLAY_0400 OUTPUT.
+ "-- 화면의  GRID가 BOUND되었는지 확인한다.
+  IF GR_GRID4 IS NOT BOUND. "바운드 - 생성이 되었냐 안되었냐
+
+    "-- GRID의 INSTANCE를 생성한다.
+    PERFORM CREATE_INSTANCE_0400.
+*
+*    "-- GRID의 LAYOUT 속성을 정의한다.
+    PERFORM INIT_LAYOUT_0400.
+*
+*    "-- ALV Standard toolbar button cotrol
+    PERFORM SET_GRID_EXCLUDE_0100.
+*
+*    "-- ALV Sort
+*    PERFORM ALV_SORT_0100.
+*
+*    "-- Field Attribute을 사용자의 요구사항에 맞게 변경
+    PERFORM APPEND_FIELDCAT_0400.
+*
+*    "-- ALV Events 등록
+    PERFORM REGIST_ALV_EVENT_0400 USING GR_GRID4.
+*
+*    "-- ALV Display
+    PERFORM DISPLAY_ALV_GRID_0400.
+
+*    "-- ALV Title
+*    PERFORM DISPLAY_ALV_TITLE_0100.
+
+  ELSE.
+
+    "-- ALV Refresh
+    PERFORM REFRESH_GRID_0400.
+
+  ENDIF.
+ENDMODULE.
+
+-----------------------------------------------------------
+Extracted by Mass Download version1.5.2 - E.G.Mellodew. 1998-2019. Sap Release753

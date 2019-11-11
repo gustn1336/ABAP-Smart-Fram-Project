@@ -1,0 +1,146 @@
+*&---------------------------------------------------------------------*
+*& Include          ZASDR0010_ALV
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*  Local Class Definition (Program 내부)                               *
+*----------------------------------------------------------------------*
+* - Prefix 정의
+*   1. LCL_  : Local Class Definition
+* - EX). CLASS LCL_EVENT_RECEIVER DEFINITION DEFERRED.
+
+CLASS LCL_EVENT_RECEIVER DEFINITION DEFERRED.
+*----------------------------------------------------------------------*
+*  Reference Varialbles for Class/Interfaces                           *
+*----------------------------------------------------------------------*
+* - Prefix 정의
+*   1. GR_  : Global Reference Varialbles
+*   2. LR_  : Local Reference Varialbles
+* - EX). GR_GRID TYPE REF TO CL_GUI_ALV_GRID.
+
+* EX).
+*DATA: GR_CON1            TYPE REF TO CL_GUI_CUSTOM_CONTAINER,
+*      GR_SPLITTER1       TYPE REF TO CL_GUI_SPLITTER_CONTAINER,
+*      GR_HEAD_CONTAINER  TYPE REF TO CL_GUI_CONTAINER,
+*      GR_DATA_CONTAINER  TYPE REF TO CL_GUI_CONTAINER,
+*      GR_DOCK1           TYPE REF TO CL_GUI_DOCKING_CONTAINER,
+*      GR_GRID_HEAD       TYPE REF TO CL_GUI_ALV_GRID,
+*      GR_GRID_DATA       TYPE REF TO CL_GUI_ALV_GRID,
+*      GR_GRID1           TYPE REF TO CL_GUI_ALV_GRID,
+*      GR_EVENT_RECEIVER  TYPE REF TO LCL_EVENT_RECEIVER.
+
+DATA: GR_CON1           TYPE REF TO CL_GUI_CUSTOM_CONTAINER,
+      "미리 6개 선언                                      모두 다 클래스임.
+      GR_CON2           TYPE REF TO CL_GUI_CUSTOM_CONTAINER,
+      "CL_GUI_CUSTOM_CONTAINER
+      GR_CON3           TYPE REF TO CL_GUI_CUSTOM_CONTAINER,
+      "데이터 타입이 아니라 클래스임.
+      GR_CON4           TYPE REF TO CL_GUI_CUSTOM_CONTAINER,
+      "컨테이너들을 변수처럼 선언.
+      GR_CON5           TYPE REF TO CL_GUI_CUSTOM_CONTAINER,
+      GR_CON6           TYPE REF TO CL_GUI_CUSTOM_CONTAINER,
+      GR_SPLITTER1      TYPE REF TO CL_GUI_SPLITTER_CONTAINER,
+      GR_HEAD_CONTAINER TYPE REF TO CL_GUI_CONTAINER,
+      GR_DATA_CONTAINER TYPE REF TO CL_GUI_CONTAINER,
+      GR_DOCK1          TYPE REF TO CL_GUI_DOCKING_CONTAINER,
+      GR_DOCK2          TYPE REF TO CL_GUI_DOCKING_CONTAINER,
+      GR_DOCK3          TYPE REF TO CL_GUI_DOCKING_CONTAINER,
+      GR_DOCK4          TYPE REF TO CL_GUI_DOCKING_CONTAINER,
+      GR_DOCK5          TYPE REF TO CL_GUI_DOCKING_CONTAINER,
+      GR_GRID_HEAD      TYPE REF TO CL_GUI_ALV_GRID,
+      "ALV
+      GR_GRID_DATA      TYPE REF TO CL_GUI_ALV_GRID,
+      GR_GRID1          TYPE REF TO CL_GUI_ALV_GRID,
+      "변수들이 생성 되었냐 안되었냐. 클래스을 참조해서 만듬. 변수로 생각해도 됨.
+      GR_GRID2          TYPE REF TO CL_GUI_ALV_GRID,
+      "화면에 있는 변수들을 가져올려고
+      GR_GRID3          TYPE REF TO CL_GUI_ALV_GRID,
+      GR_GRID4          TYPE REF TO CL_GUI_ALV_GRID,
+      GR_GRID5          TYPE REF TO CL_GUI_ALV_GRID,
+      GR_GRID6          TYPE REF TO CL_GUI_ALV_GRID,
+      GR_EVENT_RECEIVER TYPE REF TO LCL_EVENT_RECEIVER,
+
+      "Dynamic Documents: Document
+      GR_TOP_DOCUMENT   TYPE REF TO CL_DD_DOCUMENT,
+      "Reference to html container
+      GR_HTML_CNTRL     TYPE REF TO CL_GUI_HTML_VIEWER,
+      "Reference to html container
+      GR_PARENT_HTML    TYPE REF TO CL_GUI_CONTAINER.  "HTML을 쓸 때
+
+*----------------------------------------------------------------------*
+*  Global Internal Table                                               *
+*----------------------------------------------------------------------*
+*DATA: GT_FIELDCAT TYPE LVC_T_FCAT,
+*      GT_SORTCAT  TYPE LVC_T_SORT,
+*      GT_EXCLUDE  TYPE UI_FUNCTIONS,
+*      GT_F4       TYPE LVC_T_F4,
+*      GT_ROWS     TYPE LVC_T_ROW,
+*      GT_STYLE    TYPE LVC_T_STYL,
+*      GT_COLOR    TYPE LVC_T_SCOL,
+*      GT_PARA     TYPE TABLE OF RFC_SPAGPA.
+
+DATA: GT_FIELDCAT  TYPE LVC_T_FCAT,      "필드들을 선언.
+      GT_FIELDCAT2 TYPE LVC_T_FCAT,
+      ""테이블 타입이라서 TYPE만 써도 테이블이 만들어짐.
+      GT_FIELDCAT3 TYPE LVC_T_FCAT,
+      GT_FIELDCAT4 TYPE LVC_T_FCAT,
+      GT_FIELDCAT5 TYPE LVC_T_FCAT,
+      GT_FIELDCAT6 TYPE LVC_T_FCAT,
+
+      GT_SORT      TYPE LVC_T_SORT,            "ALV의 옵션값.
+      GT_EXCLUDE   TYPE UI_FUNCTIONS,
+      GT_F4        TYPE LVC_T_F4,                   "서치헬프
+      GT_ROWS      TYPE LVC_T_ROW,
+      GT_STYLE     TYPE LVC_T_STYL,            "스타일
+      GT_COLOR     TYPE LVC_T_SCOL,
+      GT_PARA      TYPE TABLE OF RFC_SPAGPA. "스트럭처라서 TABLE OF를 써줌.
+
+
+*----------------------------------------------------------------------*
+*  Global Structure                                                    *
+*----------------------------------------------------------------------*
+*DATA: GS_LAYOUT   TYPE LVC_S_LAYO,
+*      GS_FIELDCAT TYPE LVC_S_FCAT,
+*      GS_SORT     TYPE LVC_S_SORT,
+*      GS_PRINT    TYPE LVC_S_PRNT,
+*      GS_ROWS     TYPE LVC_S_ROW,
+*      GS_F4       TYPE LVC_S_F4,
+*      GS_STYLE    TYPE LVC_S_STYL,
+*      GS_COLOR    TYPE LVC_S_SCOL,
+*      GS_STABLE   TYPE LVC_S_STBL,
+*      GS_VARIANT  TYPE DISVARIANT,
+*      GS_COL      TYPE LVC_S_COL.
+
+DATA: GS_LAYOUT   TYPE LVC_S_LAYO,
+      GS_LAYOUT2  TYPE LVC_S_LAYO,
+      GS_FIELDCAT TYPE LVC_S_FCAT, "스트럭처
+      GS_SORT     TYPE LVC_S_SORT,
+      GS_PRINT    TYPE LVC_S_PRNT,
+      GS_ROWS     TYPE LVC_S_ROW,
+      GS_F4       TYPE LVC_S_F4,
+      GS_STYLE    TYPE LVC_S_STYL,
+      GS_COLOR    TYPE LVC_S_SCOL,
+      GS_STABLE   TYPE LVC_S_STBL VALUE 'XX',
+      GS_VARIANT  TYPE DISVARIANT,
+      GS_VARIANT2 TYPE DISVARIANT,
+      GS_COL      TYPE LVC_S_COL.
+
+*----------------------------------------------------------------------*
+*  Global Variant                                                      *
+*----------------------------------------------------------------------*
+*DATA: GV_CONTAINER TYPE SCRFNAME VALUE 'CT_0100',
+*      GV_SAVE      TYPE C        VALUE 'U',
+*      GV_POS       TYPE I,
+*      GV_REPID     TYPE SY-REPID.
+
+DATA: GV_CONTAINER  TYPE SCRFNAME VALUE 'CT_0100',
+      GV_CONTAINER2 TYPE SCRFNAME VALUE 'CT_0200',
+      GV_CONTAINER3 TYPE SCRFNAME VALUE 'CT_0300',
+      GV_CONTAINER4 TYPE SCRFNAME VALUE 'CT_0400',
+      GV_CONTAINER5 TYPE SCRFNAME VALUE 'CT_0500',
+      GV_CONTAINER6 TYPE SCRFNAME VALUE 'CT_0600',
+      GV_SAVE       TYPE C        VALUE 'U',
+      GV_POS        TYPE I,
+      GV_REPID      TYPE SY-REPID.
+
+-----------------------------------------------------------
+Extracted by Mass Download version1.5.2 - E.G.Mellodew. 1998-2019. Sap Release753

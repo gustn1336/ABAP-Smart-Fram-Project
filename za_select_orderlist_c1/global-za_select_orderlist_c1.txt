@@ -1,0 +1,6 @@
+FUNCTION-POOL ZEDUPA_FG10.                  "MESSAGE-ID ..
+
+* INCLUDE LZEDUPA_FG10D...                   " Local class definition
+
+-----------------------------------------------------------
+Extracted by Mass Download version1.5.2 - E.G.Mellodew. 1998-2019. Sap Release753

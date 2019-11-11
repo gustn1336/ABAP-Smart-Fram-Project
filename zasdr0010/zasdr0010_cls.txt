@@ -1,0 +1,135 @@
+*&---------------------------------------------------------------------*
+*& Include          ZASDR0010_CLS
+*&---------------------------------------------------------------------*
+CLASS LCL_EVENT_RECEIVER DEFINITION.
+
+  PUBLIC SECTION.
+    METHODS:
+      HANDLE_TOOLBAR FOR EVENT TOOLBAR OF CL_GUI_ALV_GRID
+        IMPORTING E_OBJECT
+                  E_INTERACTIVE
+                  SENDER,
+
+      HANDLE_USER_COMMAND FOR EVENT USER_COMMAND OF CL_GUI_ALV_GRID
+        IMPORTING E_UCOMM
+                  SENDER,
+
+      HANDLE_DATA_CHANGED FOR EVENT DATA_CHANGED OF CL_GUI_ALV_GRID
+        IMPORTING ER_DATA_CHANGED
+                  E_ONF4
+                  E_ONF4_BEFORE
+                  E_ONF4_AFTER
+                  E_UCOMM
+                  SENDER,
+
+      HANDLE_DATA_CHANGED_FINISHED FOR EVENT DATA_CHANGED_FINISHED
+                  OF CL_GUI_ALV_GRID
+        IMPORTING E_MODIFIED
+                  ET_GOOD_CELLS
+                  SENDER,
+
+      HANDLE_HOTSPOT_CLICK FOR EVENT HOTSPOT_CLICK OF CL_GUI_ALV_GRID
+        IMPORTING E_ROW_ID
+                  E_COLUMN_ID
+                  ES_ROW_NO
+                  SENDER,
+
+      HANDLE_DOUBLE_CLICK FOR EVENT DOUBLE_CLICK OF CL_GUI_ALV_GRID
+        IMPORTING E_ROW
+                  E_COLUMN
+                  ES_ROW_NO
+                  SENDER,
+
+      HANDLE_ONF4 FOR EVENT ONF4 OF CL_GUI_ALV_GRID
+        IMPORTING E_FIELDNAME
+                  E_FIELDVALUE
+                  ES_ROW_NO
+                  ER_EVENT_DATA
+                  ET_BAD_CELLS
+                  E_DISPLAY
+                  SENDER.
+
+  PRIVATE SECTION.
+
+ENDCLASS. "LCL_EVENT_RECEIVER DEFINITION
+
+*CLASS LCL_EVENT_RECEIVER DEFINITION DEFERRED.
+*---------------------------------------------------------------------*
+* LOCAL CLASSES: Implementation                                       *
+*---------------------------------------------------------------------*
+CLASS LCL_EVENT_RECEIVER IMPLEMENTATION.
+  METHOD HANDLE_TOOLBAR       . "Create Icon
+*    PERFORM EVENT_TOOLBAR USING  E_OBJECT
+*                                 E_INTERACTIVE
+*                                 SENDER.
+
+  ENDMETHOD.                    "HANDLE_TOOLBAR
+
+  METHOD HANDLE_USER_COMMAND  .
+*    PERFORM EVENT_USER_COMMAND USING E_UCOMM
+*                                     SENDER.
+  ENDMETHOD.                    "HANDLE_USER_COMMAND
+
+  METHOD HANDLE_DATA_CHANGED.
+    PERFORM EVENT_DATA_CHANGED USING ER_DATA_CHANGED
+                                     E_ONF4
+                                     E_ONF4_BEFORE
+                                     E_ONF4_AFTER
+                                     E_UCOMM
+                                     SENDER.
+  ENDMETHOD.                    "HANDLE_DATA_CHANGED
+
+  METHOD HANDLE_DATA_CHANGED_FINISHED.
+*    PERFORM EVENT_DATA_CHANGED_FINISHED USING E_MODIFIED
+*                                     ET_GOOD_CELLS
+*                                     SENDER.
+  ENDMETHOD.                    "HANDLE_DATA_CHANGED_FINISHED
+
+  METHOD HANDLE_HOTSPOT_CLICK.
+*    PERFORM EVENT_HOTSPOT_CLICK USING E_ROW_ID
+*                                      E_COLUMN_ID
+*                                      ES_ROW_NO
+*                                      SENDER.
+  ENDMETHOD.                    "HANDLE_HOTSPOT_CLICK
+
+  METHOD HANDLE_DOUBLE_CLICK.
+*    PERFORM EVENT_DOUBLE_CLICK USING E_ROW
+*                                     E_COLUMN
+*                                     ES_ROW_NO
+*                                     SENDER.
+
+  ENDMETHOD.                    "HANDLE_DOUBLE_CLICK
+
+  METHOD HANDLE_ONF4.
+*    PERFORM EVENT_HELP_ON_F4 USING E_FIELDNAME
+*                                   E_FIELDVALUE
+*                                   ES_ROW_NO
+*                                   ER_EVENT_DATA
+*                                   ET_BAD_CELLS
+*                                   E_DISPLAY
+*                                   SENDER.
+  ENDMETHOD.                    "HANDLE_ON_F4
+
+ENDCLASS. "LCL_EVENT_RECEIVER IMPLEMENTATION
+
+*---------------------------------------------------------------------*
+* LOCAL CLASSES: Definition
+*---------------------------------------------------------------------*
+CLASS LCL_ALV_GRID DEFINITION INHERITING FROM CL_GUI_ALV_GRID.
+  PUBLIC SECTION.
+    METHODS: SET_OPTIMIZE_ALL_COLS.
+ENDCLASS. "LCL_AlV_GRID DEFINITION
+
+*---------------------------------------------------------------------*
+* CLASS LCL_AlV_GRID IMPLEMENTATION
+*---------------------------------------------------------------------*
+CLASS LCL_ALV_GRID IMPLEMENTATION.
+  METHOD SET_OPTIMIZE_ALL_COLS.
+    CALL METHOD ME->OPTIMIZE_ALL_COLS
+      EXPORTING
+        INCLUDE_HEADER = 1.
+  ENDMETHOD.                    "SET_OPTIMIZE_ALL_COLS
+ENDCLASS. "LC
+
+-----------------------------------------------------------
+Extracted by Mass Download version1.5.2 - E.G.Mellodew. 1998-2019. Sap Release753

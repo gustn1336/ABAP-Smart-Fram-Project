@@ -1,0 +1,537 @@
+*&---------------------------------------------------------------------*
+*& Include          ZASDR0010_I01
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*&      Module  USER_COMMAND_0100  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE USER_COMMAND_0100 INPUT.
+
+  DATA: LT_MDISPLAY LIKE TABLE OF GT_MDISPLAY WITH HEADER LINE.
+
+  DATA : LT_ROWS TYPE LVC_T_ROW.  " ALV 제어: 테이블행
+  DATA: LS_ROWS TYPE LVC_S_ROW.
+
+  DATA:
+      R_MNUMB TYPE RANGE OF ZAE_MNUMB WITH HEADER LINE .
+
+  CLEAR: SAVE_OK.
+
+  "-- move ok code.
+  SAVE_OK = OK_CODE.
+  CLEAR: OK_CODE.
+
+*-- SAVE_OK ACTIONS.
+  CASE SAVE_OK.
+    WHEN 'BACK'.
+      CLEAR : GT_MDATA, GT_MDISPLAY[] ,GT_MDISPLAY.
+      LEAVE TO SCREEN 0.
+
+*    WHEN 'CHAN'.
+*
+*
+*      LOOP AT GT_MDISPLAY WHERE CHECK IS NOT INITIAL.
+*        APPEND  GT_MDISPLAY TO LT_MDISPLAY[].
+*      ENDLOOP.
+*
+*      DESCRIBE TABLE LT_MDISPLAY LINES LV_CNT.
+*
+*      IF LV_CNT = 0.
+*        MESSAGE I020 DISPLAY LIKE 'E'.
+*        CLEAR: LT_MDISPLAY[], LT_MDISPLAY, LV_CNT.
+*        EXIT.
+*      ELSEIF LV_CNT >= 2.
+*        MESSAGE I019 DISPLAY LIKE 'E'.
+*        CLEAR: LT_MDISPLAY[], LT_MDISPLAY, LV_CNT.
+*        EXIT.
+*      ENDIF.
+*
+*      LOOP AT GT_MDISPLAY WHERE CHECK IS NOT INITIAL.
+*        CALL SCREEN '0110' STARTING AT 5 5.
+*      ENDLOOP.
+*      PERFORM REFRESH_GRID_0100.
+*
+*      CLEAR: LT_MDISPLAY[], LT_MDISPLAY, LV_CNT.
+    WHEN 'SAVE'.
+
+      DATA: LS_ZASDT0020 TYPE ZASDT0020.
+      DATA: LT_ZASDT0020 LIKE TABLE OF LS_ZASDT0020.
+
+      LOOP AT GT_MDISPLAY WHERE ICON EQ '@5D@'.
+        APPEND  GT_MDISPLAY TO LT_MDISPLAY[].
+      ENDLOOP.
+
+      DESCRIBE TABLE LT_MDISPLAY LINES LV_CNT.
+
+      IF LV_CNT = 0.
+        MESSAGE I023 DISPLAY LIKE 'E'.
+
+        CLEAR: LT_MDISPLAY[], LT_MDISPLAY, LV_CNT.
+        EXIT.
+
+      ELSE.
+
+        LOOP AT GT_MDISPLAY WHERE ICON EQ '@5D@'.
+          GT_MDISPLAY-ICON = ICON_LED_GREEN.
+          MODIFY GT_MDISPLAY.
+          MOVE-CORRESPONDING GT_MDISPLAY TO LS_ZASDT0020.
+          APPEND LS_ZASDT0020 TO LT_ZASDT0020.
+        ENDLOOP.
+
+        MODIFY ZASDT0020 FROM TABLE LT_ZASDT0020.
+
+
+        PERFORM REFRESH_GRID_0100.
+
+        MESSAGE S005.
+
+        CLEAR: LT_MDISPLAY[], LT_MDISPLAY, LV_CNT.
+      ENDIF.
+
+    WHEN 'DELE'.
+
+      CALL METHOD GR_GRID1->GET_SELECTED_ROWS
+        IMPORTING
+          ET_INDEX_ROWS = LT_ROWS.
+
+      DESCRIBE TABLE LT_ROWS LINES SY-TFILL.
+
+      IF SY-TFILL = 0.   " 미선택시 마지막 행 삭제...
+        MESSAGE S020 DISPLAY LIKE 'E'.
+
+      ELSE.   " 선택시 선택행만 삭제..
+
+        R_MNUMB-SIGN = 'I'.
+        R_MNUMB-OPTION = 'EQ'.
+
+        LOOP AT LT_ROWS INTO LS_ROWS.
+          LV_CNT = LS_ROWS-INDEX.
+          READ TABLE GT_MDISPLAY INDEX LV_CNT.
+          R_MNUMB-LOW = GT_MDISPLAY-MNUMB.
+          APPEND R_MNUMB.
+        ENDLOOP.
+
+        IF R_MNUMB IS NOT INITIAL.
+          DELETE GT_MDISPLAY WHERE MNUMB IN R_MNUMB.
+        ENDIF.
+
+*        DELETE  GT_MDISPLAY FROM LT_MDISPLAY.
+
+        CLEAR : LT_ROWS, LS_ROWS , LV_CNT, LT_MDISPLAY, LT_MDISPLAY[].
+
+      ENDIF.
+*      LOOP AT GT_MDISPLAY WHERE CHECK IS NOT INITIAL.
+*        APPEND  GT_MDISPLAY TO LT_MDISPLAY[].
+*      ENDLOOP.
+*
+*      DESCRIBE TABLE LT_MDISPLAY LINES LV_CNT.
+*
+*      IF LV_CNT = 0.
+*        MESSAGE I020 DISPLAY LIKE 'E'.
+*        EXIT.
+*      ENDIF.
+*
+*      DELETE GT_MDISPLAY WHERE CHECK IS NOT INITIAL.
+*      PERFORM REFRESH_GRID_0100.
+*      MESSAGE S015 WITH LV_CNT.
+*
+*      CLEAR: LT_MDISPLAY[], LT_MDISPLAY, LV_CNT.
+
+    WHEN OTHERS.
+  ENDCASE.
+
+ENDMODULE.
+*&---------------------------------------------------------------------*
+*&      Module  EXIT  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE EXIT INPUT.
+
+*-- OK_CODE ACTIONS.
+  CASE OK_CODE.
+    WHEN 'CANC'.
+      CLEAR : GT_MDATA, GT_MDISPLAY[], GT_MDISPLAY,
+                    GT_HDATA,GT_HDISPLAY, GT_HDISPLAY[],
+                    GT_BDATA,GT_BDISPLAY, GT_BDISPLAY[],
+                    GT_IDATA,GT_IDISPLAY, GT_IDISPLAY[].
+      LEAVE TO SCREEN 0. "원래 있던 스크린에서 전 스크린으로 가라는 얘기
+
+    WHEN 'EXIT'.
+      CLEAR : GT_MDATA, GT_MDISPLAY[], GT_MDISPLAY,
+                    GT_HDATA,GT_HDISPLAY, GT_HDISPLAY[],
+                    GT_BDATA,GT_BDISPLAY, GT_BDISPLAY[],
+                    GT_IDATA,GT_IDISPLAY, GT_IDISPLAY[].
+      LEAVE PROGRAM.
+
+    WHEN OTHERS.
+  ENDCASE.
+
+ENDMODULE.
+*&---------------------------------------------------------------------*
+*&      Module  USER_COMMAND_0110  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE USER_COMMAND_0110 INPUT.
+
+  SAVE_OK = OK_CODE.
+  CLEAR: OK_CODE.
+
+*-- SAVE_OK ACTIONS.
+  CASE SAVE_OK.
+    WHEN 'CHAN'.
+
+      PERFORM MODIFY_INFO.
+      LEAVE TO SCREEN 0.
+    WHEN 'CANC'.
+
+      CLEAR: A_MNAME, A_MUNIT, A_MLENG, A_MHGHT, A_MSTAN.
+
+      LEAVE TO SCREEN 0.
+    WHEN OTHERS.
+  ENDCASE.
+
+ENDMODULE.
+*&---------------------------------------------------------------------*
+*&      Module  USER_COMMAND_0200  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE USER_COMMAND_0200 INPUT.
+
+
+  DATA: LT_HDISPLAY LIKE TABLE OF GT_HDISPLAY.
+
+  CLEAR: SAVE_OK.
+
+  "-- move ok code.
+  SAVE_OK = OK_CODE.
+  CLEAR: OK_CODE.
+
+*-- SAVE_OK ACTIONS.
+  CASE SAVE_OK.
+    WHEN 'BACK'.
+      CLEAR : GT_MDATA, GT_MDISPLAY[], GT_MDISPLAY, GT_HDATA,GT_HDISPLAY, GT_HDISPLAY[].
+      LEAVE TO SCREEN 0.
+
+    WHEN 'SAVE'.
+
+      DATA: LS_ZASDT0030 TYPE ZASDT0030.
+      DATA: LT_ZASDT0030 LIKE TABLE OF LS_ZASDT0030.
+
+      LOOP AT GT_HDISPLAY WHERE ICON EQ '@5D@'.
+        APPEND  GT_HDISPLAY TO LT_HDISPLAY[].
+      ENDLOOP.
+
+      DESCRIBE TABLE LT_HDISPLAY LINES LV_CNT.
+
+      IF LV_CNT = 0.
+        MESSAGE I023 DISPLAY LIKE 'E'.
+
+        CLEAR: LT_HDISPLAY[], LT_HDISPLAY, LV_CNT.
+        EXIT.
+
+      ELSE.
+
+        LOOP AT GT_HDISPLAY WHERE ICON EQ '@5D@'.
+          GT_HDISPLAY-ICON = ICON_LED_GREEN.
+          MODIFY GT_HDISPLAY.
+          MOVE-CORRESPONDING GT_HDISPLAY TO LS_ZASDT0030.
+          APPEND LS_ZASDT0030 TO LT_ZASDT0030.
+        ENDLOOP.
+
+        MODIFY ZASDT0030 FROM TABLE LT_ZASDT0030.
+
+
+        PERFORM REFRESH_GRID_0200.
+
+        MESSAGE S005.
+
+        CLEAR: LT_HDISPLAY[], LT_HDISPLAY, LV_CNT.
+      ENDIF.
+
+    WHEN OTHERS.
+  ENDCASE.
+ENDMODULE.
+*&---------------------------------------------------------------------*
+*&      Module  USER_COMMAND_0300  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE USER_COMMAND_0300 INPUT.
+
+  DATA: LT_BDISPLAY LIKE TABLE OF GT_BDISPLAY WITH HEADER LINE.
+
+  CLEAR: SAVE_OK.
+
+  "-- move ok code.
+  SAVE_OK = OK_CODE.
+  CLEAR: OK_CODE.
+
+*-- SAVE_OK ACTIONS.
+  CASE SAVE_OK.
+    WHEN 'BACK'.
+      CLEAR : GT_MDATA, GT_MDISPLAY[], GT_MDISPLAY,
+            GT_HDATA,GT_HDISPLAY, GT_HDISPLAY[],
+            GT_BDATA,GT_BDISPLAY, GT_BDISPLAY[].
+      LEAVE TO SCREEN 0.
+
+*    WHEN 'ICON'.
+*      LOOP AT GT_BDISPLAY.
+*        IF GT_BDISPLAY-HCODE IS INITIAL.
+*          GT_BDISPLAY-ICON = ICON_LED_RED.
+*        ELSEIF  GT_BDISPLAY-HCNUM IS INITIAL.
+*          GT_BDISPLAY-ICON = ICON_LED_RED.
+*        ELSEIF  GT_BDISPLAY-MNUMB IS INITIAL.
+*          GT_BDISPLAY-ICON = ICON_LED_RED.
+*        ELSEIF  GT_BDISPLAY-REQMT IS INITIAL.
+*          GT_BDISPLAY-ICON = ICON_LED_RED.
+*        ELSE.
+*          GT_BDISPLAY-ICON = ICON_LED_GREEN.
+*        ENDIF.
+*
+*        MODIFY GT_BDISPLAY[] FROM GT_BDISPLAY.
+*
+*      ENDLOOP.
+
+    WHEN 'SAVE'.
+
+      DATA: LS_ZASDT0040 TYPE ZASDT0040.
+      DATA: LT_ZASDT0040 LIKE TABLE OF LS_ZASDT0040.
+
+      LOOP AT GT_BDISPLAY WHERE ICON EQ '@5D@'.
+        APPEND  GT_BDISPLAY TO LT_BDISPLAY[].
+      ENDLOOP.
+
+      DESCRIBE TABLE LT_BDISPLAY LINES LV_CNT.
+
+      IF LV_CNT = 0.
+        MESSAGE I023 DISPLAY LIKE 'E'.
+
+        CLEAR: LT_BDISPLAY[], LT_BDISPLAY, LV_CNT.
+        EXIT.
+
+      ELSE.
+
+        LOOP AT GT_BDISPLAY WHERE ICON EQ '@5D@'.
+          GT_BDISPLAY-ICON = ICON_LED_GREEN.
+          MODIFY GT_BDISPLAY.
+          MOVE-CORRESPONDING GT_BDISPLAY TO LS_ZASDT0040.
+          APPEND LS_ZASDT0040 TO LT_ZASDT0040.
+        ENDLOOP.
+
+        MODIFY ZASDT0040 FROM TABLE LT_ZASDT0040.
+
+
+        PERFORM REFRESH_GRID_0300.
+
+        MESSAGE S005.
+
+        CLEAR: LT_BDISPLAY[], LT_BDISPLAY, LV_CNT.
+      ENDIF.
+
+    WHEN 'DELE'.
+
+
+      CALL METHOD GR_GRID3->GET_SELECTED_ROWS
+        IMPORTING
+          ET_INDEX_ROWS = LT_ROWS.
+
+      DESCRIBE TABLE LT_ROWS LINES SY-TFILL.
+
+      IF SY-TFILL = 0.   " 미선택시 마지막 행 삭제...
+        MESSAGE S020 DISPLAY LIKE 'E'.
+
+      ELSE.   " 선택시 선택행만 삭제..
+
+        LOOP AT LT_ROWS INTO LS_ROWS.
+          LV_CNT = LS_ROWS-INDEX.
+          READ TABLE GT_BDISPLAY INDEX LV_CNT.
+          APPEND GT_BDISPLAY TO LT_BDISPLAY.
+        ENDLOOP.
+
+        LOOP AT LT_BDISPLAY.
+          DELETE TABLE GT_BDISPLAY FROM LT_BDISPLAY.
+        ENDLOOP.
+
+
+        CLEAR : LT_ROWS, LS_ROWS, LT_BDISPLAY[], LT_BDISPLAY.
+
+      ENDIF.
+
+      PERFORM REFRESH_GRID_0300.
+*      LOOP AT GT_BDISPLAY WHERE CHECK IS NOT INITIAL.
+*        APPEND  GT_BDISPLAY TO LT_BDISPLAY[].
+*      ENDLOOP.
+*
+*      DESCRIBE TABLE LT_BDISPLAY LINES LV_CNT.
+*
+*      IF LV_CNT = 0.
+*        MESSAGE I020 DISPLAY LIKE 'E'.
+*        EXIT.
+*      ENDIF.
+*
+*      DELETE GT_BDISPLAY WHERE CHECK IS NOT INITIAL.
+*      PERFORM REFRESH_GRID_0300.
+*      MESSAGE S015 WITH LV_CNT.
+*
+*      CLEAR: LT_BDISPLAY[], LT_BDISPLAY, LV_CNT.
+
+    WHEN OTHERS.
+  ENDCASE.
+
+ENDMODULE.
+*&---------------------------------------------------------------------*
+*& Form CREATE_IDISPLAY
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM CREATE_IDISPLAY .
+
+  LOOP AT GT_IDATA INTO GS_IDATA.
+
+    MOVE-CORRESPONDING GS_IDATA TO GT_IDISPLAY.
+    APPEND GT_IDISPLAY.
+
+    CLEAR GT_IDISPLAY.
+
+  ENDLOOP.
+
+  LOOP AT GT_IDISPLAY.
+    IF GT_IDISPLAY-HCODE IS INITIAL.
+      GT_IDISPLAY-ICON = ICON_LED_RED.
+    ELSEIF  GT_IDISPLAY-PROCCD IS INITIAL.
+      GT_IDISPLAY-ICON = ICON_LED_RED.
+    ELSEIF  GT_IDISPLAY-PROSDAY IS INITIAL.
+      GT_IDISPLAY-ICON = ICON_LED_RED.
+    ELSEIF  GT_IDISPLAY-SEQ IS INITIAL.
+      GT_IDISPLAY-ICON = ICON_LED_RED.
+
+
+    ELSE.
+      GT_IDISPLAY-ICON = ICON_LED_YELLOW.
+    ENDIF.
+
+    MODIFY GT_IDISPLAY[] FROM GT_IDISPLAY.
+
+  ENDLOOP.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Module  USER_COMMAND_0400  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE USER_COMMAND_0400 INPUT.
+
+  DATA: LT_IDISPLAY LIKE TABLE OF GT_IDISPLAY WITH HEADER LINE.
+
+  CLEAR: SAVE_OK.
+
+  "-- move ok code.
+  SAVE_OK = OK_CODE.
+  CLEAR: OK_CODE.
+
+*-- SAVE_OK ACTIONS.
+  CASE SAVE_OK.
+    WHEN 'BACK'.
+      CLEAR : GT_IDATA, GT_IDISPLAY[], GT_IDISPLAY.
+      LEAVE TO SCREEN 0.
+
+    WHEN 'SAVE'.
+
+      DATA: LS_ZAPST0010 TYPE ZAPST0010.
+      DATA: LT_ZAPST0010 LIKE TABLE OF LS_ZAPST0010.
+
+      LOOP AT GT_IDISPLAY WHERE ICON EQ '@5D@'.
+        APPEND  GT_IDISPLAY TO LT_IDISPLAY[].
+      ENDLOOP.
+
+      DESCRIBE TABLE LT_IDISPLAY LINES LV_CNT.
+
+      IF LV_CNT = 0.
+        MESSAGE I023 DISPLAY LIKE 'E'.
+
+        CLEAR: LT_IDISPLAY[], LT_IDISPLAY, LV_CNT.
+        EXIT.
+
+      ELSE.
+
+        LOOP AT GT_IDISPLAY WHERE ICON EQ '@5D@'.
+          GT_IDISPLAY-ICON = ICON_LED_GREEN.
+          MODIFY GT_IDISPLAY.
+          MOVE-CORRESPONDING GT_IDISPLAY TO LS_ZAPST0010.
+          APPEND LS_ZAPST0010 TO LT_ZAPST0010.
+        ENDLOOP.
+
+        MODIFY ZAPST0010 FROM TABLE LT_ZAPST0010.
+
+
+        PERFORM REFRESH_GRID_0400.
+
+        MESSAGE S005.
+
+        CLEAR: LT_IDISPLAY[], LT_IDISPLAY, LV_CNT.
+      ENDIF.
+
+    WHEN 'DELE'.
+
+
+      CALL METHOD GR_GRID4->GET_SELECTED_ROWS
+        IMPORTING
+          ET_INDEX_ROWS = LT_ROWS.
+
+      DESCRIBE TABLE LT_ROWS LINES SY-TFILL.
+
+      IF SY-TFILL = 0.   " 미선택시 마지막 행 삭제...
+        MESSAGE S020 DISPLAY LIKE 'E'.
+
+      ELSE.   " 선택시 선택행만 삭제..
+
+         LOOP AT LT_ROWS INTO LS_ROWS.
+          LV_CNT = LS_ROWS-INDEX.
+          READ TABLE GT_IDISPLAY INDEX LV_CNT.
+          APPEND GT_IDISPLAY TO LT_IDISPLAY.
+        ENDLOOP.
+
+        LOOP AT LT_IDISPLAY.
+          DELETE TABLE GT_IDISPLAY FROM LT_IDISPLAY.
+        ENDLOOP.
+
+
+        CLEAR : LT_ROWS, LS_ROWS, LT_IDISPLAY[], LT_IDISPLAY.
+
+      ENDIF.
+
+      PERFORM REFRESH_GRID_0400.
+
+
+*      LOOP AT GT_BDISPLAY WHERE CHECK IS NOT INITIAL.
+*        APPEND  GT_BDISPLAY TO LT_BDISPLAY[].
+*      ENDLOOP.
+*
+*      DESCRIBE TABLE LT_BDISPLAY LINES LV_CNT.
+*
+*      IF LV_CNT = 0.
+*        MESSAGE I020 DISPLAY LIKE 'E'.
+*        EXIT.
+*      ENDIF.
+*
+*      DELETE GT_BDISPLAY WHERE CHECK IS NOT INITIAL.
+*      PERFORM REFRESH_GRID_0300.
+*      MESSAGE S015 WITH LV_CNT.
+*
+*      CLEAR: LT_BDISPLAY[], LT_BDISPLAY, LV_CNT.
+
+    WHEN OTHERS.
+  ENDCASE.
+
+ENDMODULE.
+
+-----------------------------------------------------------
+Extracted by Mass Download version1.5.2 - E.G.Mellodew. 1998-2019. Sap Release753
